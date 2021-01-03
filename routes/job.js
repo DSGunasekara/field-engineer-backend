@@ -8,7 +8,10 @@ const auth = require("../middleware/verify");
 router.get("/", async (req, res) => {
   try {
     await Job.find({})
-      .populate("assignedEngineers")
+      .populate({
+        path: "assignedEngineers",
+        select: "name _id email",
+      })
       .exec()
       .then((jobs, error) => {
         if (error) return res.status(400).send(error);
@@ -23,7 +26,10 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     await Job.findOne({ _id: req.params.id })
-      .populate("assignedEngineers")
+      .populate({
+        path: "assignedEngineers",
+        select: "name _id email",
+      })
       .exec()
       .then((job, error) => {
         if (error) return res.status(400).send(error);
@@ -185,11 +191,9 @@ router.delete("/:id", async (req, res) => {
   try {
     const job = await Job.findOne({ _id: req.params.id });
     if (!job) return res.status(404).send("Job does not exits");
-    await job.remove(async (error, _) => {
-      if (error) return res.status(400).send(error);
-
-      return res.status(200).send("Job deleted");
-    });
+    await job.remove();
+    await User.updateMany({ $pullAll: { jobHistory: [req.params.id] } });
+    return res.status(200).send("Job deleted");
   } catch (error) {
     return res.status(500).send(error);
   }
