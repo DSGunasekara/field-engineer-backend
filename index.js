@@ -4,8 +4,8 @@ const cors = require("cors");
 
 //routes
 const userRoute = require("./routes/user");
-// const authRoute = require("./routes/auth");
-// const jobRoute = require("./routes/job");
+const authRoute = require("./routes/auth");
+const jobRoute = require("./routes/job");
 // const engineerRoute = require("./routes/engineer");
 
 const app = express();
@@ -26,8 +26,8 @@ app.use(express.static("./public"));
 app.get("/", (req, res) => res.send("API Running"));
 
 app.use("/api/user", userRoute);
-// app.use("/api/login", authRoute);
-// app.use("/api/job", jobRoute);
+app.use("/api/login", authRoute);
+app.use("/api/job", jobRoute);
 // app.use("/api/engineer", engineerRoute);
 
 const PORT = process.env.PORT || 5000;

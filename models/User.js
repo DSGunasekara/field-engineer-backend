@@ -22,6 +22,7 @@ const UserSchema = new mongoose.Schema({
   contactNo: {
     type: String,
     required: true,
+    unique: true,
   },
   state: {
     type: String,
