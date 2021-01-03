@@ -3,10 +3,12 @@ const Job = require("../models/Job");
 const User = require("../models/User");
 // const upload = require("../middleware/images");
 const auth = require("../middleware/verify");
+const verify = require("../middleware/verify");
 
 //get all jobs
-router.get("/", async (req, res) => {
+router.get("/", verify, async (req, res) => {
   try {
+    // if (req.user.role != "Admin") return res.status(403).send("Auth Failed");
     await Job.find({})
       .populate({
         path: "assignedEngineers",

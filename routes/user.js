@@ -15,6 +15,28 @@ router.get("/", async (req, res) => {
   }
 });
 
+//get all engineers
+router.get("/engineers", async (req, res) => {
+  try {
+    const engineers = await User.find({ role: "Engineer" })
+      .select("-password")
+      .populate("jobHistory");
+    return res.status(200).send(engineers);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+});
+
+//get all admins
+router.get("/admins", async (req, res) => {
+  try {
+    const admins = await User.find({ role: "Admin" }).select("-password");
+    return res.status(200).send(admins);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+});
+
 //get one user
 router.get("/:id", async (req, res) => {
   try {
