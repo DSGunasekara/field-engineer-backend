@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const Job = require("../models/Job")
 
 //get all users
 router.get("/", async (req, res) => {
@@ -125,11 +126,15 @@ router.delete("/:id", async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.params.id });
     if (!user) return res.status(404).send("User does not exits");
+
+    await Job.updateMany({ $pullAll: {assignedEngineers: [req.params.id] } } )
+
     await user.remove((error, _) => {
       if (error) return res.status(400).send(error);
       return res.status(200).send("User deleted");
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).send(error);
   }
 });

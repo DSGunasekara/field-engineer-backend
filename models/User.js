@@ -44,7 +44,7 @@ const UserSchema = new mongoose.Schema({
   availability: {
     type: Boolean,
     required: false,
-    default: false,
+    default: true,
   },
   jobHistory: [
     {
