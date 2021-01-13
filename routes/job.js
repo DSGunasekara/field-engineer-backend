@@ -12,7 +12,7 @@ router.get("/", verify, async (req, res) => {
     await Job.find({})
       .populate({
         path: "assignedEngineers",
-        select: "name _id email",
+        select: "-password",
       })
       .exec()
       .then((jobs, error) => {
@@ -30,7 +30,7 @@ router.get("/:id", verify, async (req, res) => {
     await Job.findOne({ _id: req.params.id })
       .populate({
         path: "assignedEngineers",
-        select: "name _id email",
+        select: "-password",
       })
       .exec()
       .then((job, error) => {
@@ -41,6 +41,16 @@ router.get("/:id", verify, async (req, res) => {
     return res.status(500).send(error);
   }
 });
+
+//get user jobs
+router.get("/user/:id", verify, async(req, res)=>{
+  try {
+    const jobs = await Job.find({assignedEngineers: req.body.engineer})
+    return res.status(200).send(jobs);
+  } catch (error) {
+    return res.status(500).send(error)
+  }
+})
 
 //post a job
 router.post("/", verify, async (req, res) => {
@@ -106,31 +116,31 @@ router.patch("/assignEngineer/:id", async (req, res) => {
   try {
     const job = await Job.findOne({ _id: req.params.id });
     if (!job) {
-      // console.log("job");
       return res.status(404).send("Job does not exits");
     }
-
+  
     const user = await User.findOne({ _id: req.body.engineer });
     if (!user) {
-      // console.log("user");
       return res.status(404).send("No user found");
     }
+
+    const checkEngineer = await Job.findOne({ _id: job._id, assignedEngineers: req.body.engineer});
+    
+    if (checkEngineer) return res.status(409).send("Engineer already assigned");
 
     const jobDate = job.date.toISOString().substr(0, 10);
     const endDate = new Date(jobDate);
     let day = jobDate.substr(8, 10);
-    // console.log(day);
+
     endDate.setDate(parseInt(day) + 1);
-    // console.log(jobDate);
-    // console.log(endDate);
+
 
     const jobList = await Job.find({
       assignedEngineers: user,
       date: { $gte: jobDate, $lt: endDate.toISOString().substr(0, 10) },
     });
-    // console.log(jobList);
+
     if (jobList.length !== 0) {
-      // console.log(jobList.length);
       return res.status(409).send("Engineer job date conflict");
     }
 
@@ -139,13 +149,8 @@ router.patch("/assignEngineer/:id", async (req, res) => {
         .status(400)
         .send("Engineer availability is set to unavailable");
 
-    const checkEngineer = await Job.findOne({
-      assignedEngineers: req.body.engineer,
-    });
-    if (checkEngineer) return res.status(409).send("Engineer already assigned");
-
     if (job.requiredEngineers > job.assignedEngineers.length) {
-      // console.log(engineer);
+
       const engineerId = user._id;
       job.assignedEngineers.push(engineerId);
       if (job.requiredEngineers === job.assignedEngineers.length) {
@@ -165,18 +170,18 @@ router.patch("/assignEngineer/:id", async (req, res) => {
 });
 
 //remove an engineer from a job
-router.patch("/removeEngineer/:id", async (req, res) => {
+router.patch("/removeEngineer/:id", verify, async (req, res) => {
   try {
     const job = await Job.findOne({ _id: req.params.id });
     if (!job) return res.status(404).send("Job does not exits");
 
-    const engineer = await User.findOne({ _id: req.body.engineer });
+    const engineer = await User.findOne({ _id: req.user.id });
     if (!engineer) return res.status(404).send("Engineer does not exits");
 
     //Removes the engineers from the array
     await Job.updateOne(
       { _id: req.params.id },
-      { $pullAll: { assignedEngineers: [req.body.engineer] } }
+      { $pullAll: { assignedEngineers: [req.user.id] } }
     );
     job.status = "Pending";
     await job.save();
@@ -184,7 +189,7 @@ router.patch("/removeEngineer/:id", async (req, res) => {
     //Removes the job from the engineer job history
 
     await User.updateOne(
-      { _id: req.body.engineer },
+      { _id: req.user.id },
       { $pullAll: { jobHistory: [req.params.id] } }
     );
 
