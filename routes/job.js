@@ -25,7 +25,7 @@ router.get("/", verify, async (req, res) => {
 });
 
 //get one job
-router.get("/:id", async (req, res) => {
+router.get("/:id", verify, async (req, res) => {
   try {
     await Job.findOne({ _id: req.params.id })
       .populate({
@@ -43,7 +43,7 @@ router.get("/:id", async (req, res) => {
 });
 
 //post a job
-router.post("/", async (req, res) => {
+router.post("/", verify, async (req, res) => {
   try {
     const job = new Job({ ...req.body });
 
@@ -60,12 +60,19 @@ router.post("/", async (req, res) => {
 });
 
 //update a job
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", verify, async (req, res) => {
   try {
     const job = await Job.findOne({ _id: req.params.id });
+    
     if (!job) return res.status(404).send("Job does not exits");
-    if (job.requiredEngineers <= job.assignedEngineers.length)
-      await Job.updateOne({ _id: req.params.id }, req.body);
+    if (job.requiredEngineers >= job.assignedEngineers.length){
+      await Job.updateOne({ _id: job._id }, {...req.body});
+      if(req.user.role != "Admin"){
+        const engineer = await User.findById({_id: req.user.id});
+        engineer.jobHistory.push(job._id);
+        await engineer.save();
+      }
+    }  
     //TODO: update engineer job list history
     return res.status(200).send("Job updated");
   } catch (error) {

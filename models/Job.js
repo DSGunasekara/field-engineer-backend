@@ -38,7 +38,6 @@ const JobSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: true,
   },
   requiredEngineers: {
     type: Number,
