@@ -8,6 +8,9 @@ const JobSchema = new mongoose.Schema({
     type: Date,
     require: true,
   },
+  startedTime:{
+    type: Date,
+  },
   endTime: {
     type: Date,
   },

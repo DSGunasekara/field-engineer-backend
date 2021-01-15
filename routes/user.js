@@ -127,7 +127,7 @@ router.delete("/:id", async (req, res) => {
     const user = await User.findOne({ _id: req.params.id });
     if (!user) return res.status(404).send("User does not exits");
 
-    await Job.updateMany({ $pullAll: {assignedEngineers: [req.params.id] } } )
+    await Job.updateMany({ $pullAll: {assignedEngineers: [req.params.id] }, status: "Pending" } )
 
     await user.remove((error, _) => {
       if (error) return res.status(400).send(error);

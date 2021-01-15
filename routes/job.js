@@ -77,6 +77,12 @@ router.patch("/:id", verify, async (req, res) => {
     if (!job) return res.status(404).send("Job does not exits");
     if (job.requiredEngineers >= job.assignedEngineers.length){
       await Job.updateOne({ _id: job._id }, {...req.body});
+
+      const { setDate } = req.body;
+      if(setDate === true){
+       return res.status(200).send("Job Updated") 
+      }
+
       if(req.user.role != "Admin"){
         const engineer = await User.findById({_id: req.user.id});
         engineer.jobHistory.push(job._id);
@@ -86,6 +92,7 @@ router.patch("/:id", verify, async (req, res) => {
     //TODO: update engineer job list history
     return res.status(200).send("Job updated");
   } catch (error) {
+    console.log(error);
     return res.status(500).send(error);
   }
 });
