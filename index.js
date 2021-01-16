@@ -6,6 +6,8 @@ const cors = require("cors");
 const userRoute = require("./routes/user");
 const authRoute = require("./routes/auth");
 const jobRoute = require("./routes/job");
+const itemRoute = require('./routes/inventory')
+const requestRoute = require('./routes/request')
 // const engineerRoute = require("./routes/engineer");
 
 const app = express();
@@ -28,6 +30,8 @@ app.get("/", (req, res) => res.send("API Running"));
 app.use("/api/user", userRoute);
 app.use("/api/login", authRoute);
 app.use("/api/job", jobRoute);
+app.use("/api/inventory", itemRoute);
+app.use('/api/request', requestRoute);
 // app.use("/api/engineer", engineerRoute);
 
 const PORT = process.env.PORT || 5000;

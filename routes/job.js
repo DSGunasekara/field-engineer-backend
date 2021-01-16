@@ -2,7 +2,6 @@ const router = require("express").Router();
 const Job = require("../models/Job");
 const User = require("../models/User");
 // const upload = require("../middleware/images");
-const auth = require("../middleware/verify");
 const verify = require("../middleware/verify");
 
 //get all jobs
