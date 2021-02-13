@@ -27,8 +27,8 @@ router.get('/:id', async(req, res)=>{
 router.post('/', async(req, res)=>{
     try {
         const item = new Item({...req.body})
-        const error = await item.save()
-        if(error) return res.status(400).send(error);
+        await item.save()
+ 
         return res.status(200).send(item)
     } catch (error) {
         return res.status(500).send(error)

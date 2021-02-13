@@ -14,6 +14,10 @@ const RequestScheme = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     },
+    job:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Job",
+    },
     qty:{
         type:Number,
         required:true
@@ -22,6 +26,9 @@ const RequestScheme = new mongoose.Schema({
         type:String,
         required: true,
         default: "Pending"
+    },
+    note:{
+        type: String
     }
 })
 
