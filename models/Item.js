@@ -13,10 +13,9 @@ const ItemSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    allocatedQty:{
+    price:{
         type: Number,
-        required: true,
-        default: 0
+        required: true
     },
     inventoryLocation:{
         type: String,

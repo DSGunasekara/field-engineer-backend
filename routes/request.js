@@ -43,10 +43,16 @@ router.get('/:id', async(req, res)=>{
 router.post('/', async(req, res)=>{
     try {
         const user = await User.findById(req.body.requestedUser)
-        if(!user) return res.status(404).send("No user found")
+        if(!user) {
+            console.log('no user');
+            return res.status(404).send("No user found")
+        }
 
         const item = await Item.findById(req.body.item);
-        if(!item) return res.status(404).send("No item found");
+        if(!item) {
+            console.log('no item');
+            return res.status(404).send("No item found");
+        }
 
         const requestItem = new RequestItem({...req.body});
 
@@ -54,7 +60,7 @@ router.post('/', async(req, res)=>{
             return res.status(400).send("Not enough items")
         }
 
-        item.allocatedQty += requestItem.qty;
+        // item.allocatedQty += requestItem.qty;
         await item.save()
 
         await requestItem.save()
