@@ -13,6 +13,7 @@ router.get('/', async(req, res)=>{
                 path: "requestedUser",
                 select: "-password"
           })
+          .populate("job")
           .exec()
           .then((requests, error) => {
             if (error) return res.status(400).send(error);
@@ -30,6 +31,7 @@ router.get('/:id', async(req, res)=>{
               path: "requestedUser",
               select: "-password"
         })
+        .populate("job")
         .exec()
         .then((requests, error) => {
           if (error) return res.status(400).send(error);
@@ -72,10 +74,22 @@ router.post('/', async(req, res)=>{
 
 router.patch('/:id', async(req, res)=>{
     try {
-        const requestItem = await RequestItem.findById(req.params.id)
+        const requestItem = await RequestItem.findById(req.body._id)
         if(!requestItem) return res.status(404).send("No request found")
+        let permission = requestItem.status
+        let newPer = req.body.status
+
+        if(newPer === "Approved" && newPer !== permission){
+            const item = await Item.findById(requestItem.item._id)
+            item.qty -= requestItem.qty;
+            await item.save()
+        }else if(newPer === "Rejected" && newPer !== permission){
+            const item = await Item.findById(requestItem.item._id)
+            item.qty += requestItem.qty;
+            await item.save()
+        }
         await RequestItem.updateOne({ _id: req.params.id }, {...req.body});
-        return res.status(200).send("Item Updated")
+        return res.status(200).send("Request Updated")
     } catch (error) {
         return res.status(500).send(error)
     }
