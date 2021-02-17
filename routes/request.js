@@ -99,10 +99,6 @@ router.delete('/:id', async(req, res)=>{
     try {
         const requestItem = await RequestItem.findById(req.params.id)
         if(!requestItem) return res.status(404).send("No request found")
-        const item = await Item.findById(requestItem.item)
-        if(!item) return res.status(404).send("Item not found")
-        item.allocatedQty -= requestItem.qty
-        await item.save()
         await requestItem.remove()
         return res.status(200).send("Request deleted")
     } catch (error) {
