@@ -4,9 +4,8 @@ const User = require("../models/User");
 const Item = require("../models/Item");
 const RequestItem = require('../models/Request')
 const verify = require("../middleware/verify");
-const { findById } = require("../models/Request");
 
-router.get('/', async(req, res)=>{
+router.get('/', verify, async(req, res)=>{
     try {
         await RequestItem.find().populate({path: "item",}
           ).populate({
@@ -24,7 +23,7 @@ router.get('/', async(req, res)=>{
     }
 });
 
-router.get('/:id', async(req, res)=>{
+router.get('/:id', verify, async(req, res)=>{
     try {
         await RequestItem.findById(req.params.id).populate({path: "item",}
         ).populate({
@@ -42,7 +41,17 @@ router.get('/:id', async(req, res)=>{
     }
 });
 
-router.post('/', async(req, res)=>{
+router.get('/job/:id', verify, async(req, res)=>{
+    try {
+        const items = await RequestItem.find({job: req.params.id, status: "Approved"}).populate("item")
+        return res.status(200).send(items)
+        
+    } catch (error) {
+        return res.status(500).send(error)
+    }
+})
+
+router.post('/', verify, async(req, res)=>{
     try {
         const user = await User.findById(req.body.requestedUser)
         if(!user) {
@@ -72,7 +81,7 @@ router.post('/', async(req, res)=>{
     }
 });
 
-router.patch('/:id', async(req, res)=>{
+router.patch('/:id', verify, async(req, res)=>{
     try {
         const requestItem = await RequestItem.findById(req.body._id)
         if(!requestItem) return res.status(404).send("No request found")
@@ -95,7 +104,7 @@ router.patch('/:id', async(req, res)=>{
     }
 });
 
-router.delete('/:id', async(req, res)=>{
+router.delete('/:id', verify, async(req, res)=>{
     try {
         const requestItem = await RequestItem.findById(req.params.id)
         if(!requestItem) return res.status(404).send("No request found")
