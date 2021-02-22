@@ -118,7 +118,6 @@ router.patch(
       if (!job) {
         return res.status(404).send("Job does not exits");
       }
-      console.log(req.file);
 
       const img = {
         ImageUrl: req.file.path,
@@ -136,6 +135,18 @@ router.patch(
     }
   }
 );
+
+//approve images
+router.patch('/updateImgs/:id', async(req, res)=>{
+  try {
+    await Job.updateOne({'jobImages._id': req.params.id}, {$set:{'jobImages.$.status': req.body.status}})
+
+    return res.status(200).send("updated")
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error)
+  }
+})
 
 //add a engineer to the job
 router.patch("/assignEngineer/:id", async (req, res) => {
