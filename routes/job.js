@@ -1,9 +1,19 @@
 const router = require("express").Router();
 const Job = require("../models/Job");
 const User = require("../models/User");
-// const Item = 
-// const upload = require("../middleware/images");
+const multer = require('multer')
 const verify = require("../middleware/verify");
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb){
+    cb(null, './uploads/')
+  },
+  filename: function(req, file, cb){
+    cb(null, Date.now() + file.originalname)
+  }
+})
+
+const upload = multer({storage: storage})
 
 //get all jobs
 router.get("/", verify, async (req, res) => {
@@ -97,26 +107,35 @@ router.patch("/:id", verify, async (req, res) => {
   }
 });
 
-//upload images
-// router.patch(
-//   "/upload/image",
-//   auth,
-//   upload.single("jobImg"),
-//   async (req, res) => {
-//     try {
-//       const user = await User.findById(req.user.id);
-//       if (!user) return res.status(404).send("User does not exits");
-//       console.log(user._id);
-//       const engineer = await Engineer.findOne({ user: user._id }); //FIX
-//       if (!engineer) return res.status(404).send("Engineer does not exits");
+// upload images
+router.patch(
+  "/upload/:id",
+  verify,
+  upload.single("jobImg"),
+  async (req, res) => {
+    try {
+      const job = await Job.findById({_id: req.params.id})
+      if (!job) {
+        return res.status(404).send("Job does not exits");
+      }
+      console.log(req.file);
 
-//       return res.status(200).send(engineer);
-//     } catch (error) {
-//       console.log(error);
-//       return res.status(500).send(error);
-//     }
-//   }
-// );
+      const img = {
+        ImageUrl: req.file.path,
+        UserName: req.body.name,
+        note: req.body.note
+      }
+
+      job.jobImages.push(img);
+      await job.save()
+      return res.status(200).send(job)
+
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  }
+);
 
 //add a engineer to the job
 router.patch("/assignEngineer/:id", async (req, res) => {

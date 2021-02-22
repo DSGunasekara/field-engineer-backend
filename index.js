@@ -22,7 +22,7 @@ connectDB().then(
 //Init middleware
 app.use(cors());
 app.use(express.json({ extended: false }));
-app.use(express.static("./public"));
+app.use('/uploads', express.static('uploads'));
 
 //change this to redirect requests to landing page
 app.get("/", (req, res) => res.send("API Running"));

@@ -52,6 +52,23 @@ const JobSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
+  jobImages:[
+    {
+      ImageUrl: {
+        type: String
+      },
+      UserName: {
+        type: String
+      }, 
+      note:{
+        type: String
+      },
+      status: {
+        type: Boolean,
+        default: false
+      }
+    }
+  ]
 });
 
 module.exports = mongoose.model("Job", JobSchema);
