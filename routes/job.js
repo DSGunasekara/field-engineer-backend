@@ -237,7 +237,7 @@ router.patch("/removeEngineer/:id", verify, async (req, res) => {
     //Removes the job from the engineer job history
 
     await User.updateOne(
-      { _id: req.user.id },
+      { _id: req.body.user },
       { $pullAll: { jobHistory: [req.params.id] } }
     );
 
