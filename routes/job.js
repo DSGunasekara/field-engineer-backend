@@ -219,16 +219,17 @@ router.patch("/assignEngineer/:id", async (req, res) => {
 //remove an engineer from a job
 router.patch("/removeEngineer/:id", verify, async (req, res) => {
   try {
+    console.log(req.body);
     const job = await Job.findOne({ _id: req.params.id });
     if (!job) return res.status(404).send("Job does not exits");
 
-    const engineer = await User.findOne({ _id: req.user.id });
+    const engineer = await User.findOne({ _id: req.body.user });
     if (!engineer) return res.status(404).send("Engineer does not exits");
 
     //Removes the engineers from the array
     await Job.updateOne(
       { _id: req.params.id },
-      { $pullAll: { assignedEngineers: [req.user.id] } }
+      { $pullAll: { assignedEngineers: [req.body.user] } }
     );
     job.status = "Pending";
     await job.save();
