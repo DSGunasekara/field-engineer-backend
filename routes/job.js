@@ -83,10 +83,20 @@ router.post("/", verify, async (req, res) => {
 router.patch("/:id", verify, async (req, res) => {
   try {
     const job = await Job.findOne({ _id: req.params.id });
+    const prevDate = job.date
     
     if (!job) return res.status(404).send("Job does not exits");
     if (job.requiredEngineers >= job.assignedEngineers.length){
       await Job.updateOne({ _id: job._id }, {...req.body});
+      const newjob = await Job.findOne({ _id: req.params.id });
+      
+
+      if(prevDate.toDateString() !== newjob.date.toDateString()){ //Resheduling makes the start and end date null
+        newjob.status = 'Resheduled'
+        newjob.endTime = undefined
+        newjob.startedTime = undefined
+        await newjob.save()
+      }
 
       const { setDate } = req.body;
       if(setDate === true){
