@@ -92,7 +92,7 @@ router.patch("/:id", verify, async (req, res) => {
       
 
       if(prevDate.toDateString() !== newjob.date.toDateString()){ //Resheduling makes the start and end date null
-        newjob.status = 'Resheduled'
+        newjob.status = 'Reschedule'
         newjob.endTime = undefined
         newjob.startedTime = undefined
         await newjob.save()
