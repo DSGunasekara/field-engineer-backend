@@ -200,9 +200,7 @@ router.patch("/assignEngineer/:id", async (req, res) => {
 
       const engineerId = user._id;
       job.assignedEngineers.push(engineerId);
-      if (job.requiredEngineers === job.assignedEngineers.length) {
-        job.status = "Assigned";
-      }
+      
       user.jobHistory.push(job._id);
       await user.save();
       await job.save();
