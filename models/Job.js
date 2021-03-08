@@ -39,6 +39,10 @@ const JobSchema = new mongoose.Schema({
   rate: {
     type: Number,
   },
+  starRate:{
+    type: Number,
+    default: 0
+  },
   category: {
     type: String,
   },
