@@ -105,7 +105,7 @@ router.patch("/:id", verify, async (req, res) => {
       
 
       if(prevDate.toDateString() !== newjob.date.toDateString()){ //Resheduling makes the start and end date null
-        newjob.status = 'Resheduled'
+        newjob.status = 'Reschedule'
         newjob.endTime = undefined
         newjob.startedTime = undefined
         await newjob.save()
@@ -213,9 +213,7 @@ router.patch("/assignEngineer/:id", async (req, res) => {
 
       const engineerId = user._id;
       job.assignedEngineers.push(engineerId);
-      if (job.requiredEngineers === job.assignedEngineers.length) {
-        job.status = "Assigned";
-      }
+      
       user.jobHistory.push(job._id);
       await user.save();
       await job.save();
