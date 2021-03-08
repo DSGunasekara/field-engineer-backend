@@ -116,7 +116,7 @@ router.patch("/:id", verify, async (req, res) => {
        return res.status(200).send("Job Updated") 
       }
 
-      if(req.user.role != "Admin"){
+      if(req.user.role != "Admin" && req.user.role != "Customer"){
         const engineer = await User.findById({_id: req.user.id});
         engineer.jobHistory.push(job._id);
         await engineer.save();
