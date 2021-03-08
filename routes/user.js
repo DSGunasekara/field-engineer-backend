@@ -28,6 +28,18 @@ router.get("/engineers", async (req, res) => {
   }
 });
 
+//Get all the customers
+router.get("/customers", async (req, res) => {
+  try {
+    const customers = await User.find({ role: "Customer" })
+      .select("-password")
+      .populate("jobHistory");
+    return res.status(200).send(customers);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+});
+
 //get all admins
 router.get("/admins", async (req, res) => {
   try {

@@ -24,9 +24,11 @@ router.get("/", verify, async (req, res) => {
         path: "assignedEngineers",
         select: "-password",
       })
+      .populate('customer')
       .exec()
       .then((jobs, error) => {
         if (error) return res.status(400).send(error);
+        console.log(jobs);
         return res.status(200).send(jobs);
       });
   } catch (error) {
@@ -42,6 +44,7 @@ router.get("/:id", verify, async (req, res) => {
         path: "assignedEngineers",
         select: "-password",
       })
+      .populate('customer')
       .exec()
       .then((job, error) => {
         if (error) return res.status(400).send(error);
@@ -67,11 +70,21 @@ router.post("/", verify, async (req, res) => {
   try {
     const job = new Job({ ...req.body });
 
-    job.save((error, _) => {
+      job.save((error, jobId) => {
       if (error) {
         console.log(error);
         return res.status(400).send(error);
       }
+      // console.log(req.body.customer);
+      User.findById({_id: req.body.customer})
+      .then(cus=>{
+        console.log(cus);
+        cus.jobHistory.push(jobId._id)
+        cus.save((error, _)=>{
+          if(error) return res.status(400).send(error)
+        })
+      })
+      
       return res.status(200).send(job);
     });
   } catch (error) {

@@ -52,6 +52,10 @@ const JobSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
+  customer:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  },
   jobImages:[
     {
       ImageUrl: {
